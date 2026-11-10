@@ -1,0 +1,49 @@
+{
+  "endpoint": "pii",
+  "request": {
+    "text": "The office printer is offline after the latest update.",
+    "entities": [
+      "person",
+      "email",
+      "phone",
+      "username",
+      "address"
+    ],
+    "threshold": 0.5,
+    "anonymize": "replace"
+  },
+  "raw": {
+    "model": "clocked-1.0",
+    "entities": [],
+    "counts": {},
+    "threshold": 0.5,
+    "instructions_used": "default",
+    "mentions": {
+      "candidates": 0,
+      "variants": 0,
+      "reads": 0,
+      "verified": 0,
+      "occurrences": {
+        "read": 0,
+        "kept": 0
+      },
+      "rejected": {},
+      "spans": 0,
+      "ms": 0
+    },
+    "checks": {
+      "trimmed": 0,
+      "split": 0,
+      "rejected": {}
+    },
+    "anonymized_text": "The office printer is offline after the latest update.",
+    "timing": {
+      "read_ms": 30,
+      "total_ms": 30
+    }
+  },
+  "model_ms": 27.276575,
+  "credits": 2,
+  "cost_usd": 0.000398,
+  "cost_basis": "reference"
+}
