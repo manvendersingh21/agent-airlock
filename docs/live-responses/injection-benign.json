@@ -1,0 +1,44 @@
+{
+  "endpoint": "injection",
+  "request": {
+    "text": "The printer maintenance is complete. The next maintenance window is Friday at 18:00 UTC.",
+    "source": "content",
+    "evidence": true
+  },
+  "raw": {
+    "model": "clocked-1.0",
+    "injection": 0.0021449256451391285,
+    "verdict": "benign",
+    "threshold": 0.5,
+    "source": "content",
+    "instructions_used": "default",
+    "category": "benign",
+    "categories": {
+      "benign": 0.995214611007228,
+      "instruction override": 0.0010571859784600298,
+      "role-play or persona jailbreak": 0.0007009759451885098,
+      "system prompt or secret extraction": 0.0007390583256532118,
+      "obfuscated or encoded payload": 0.0006945928340163388,
+      "tool misuse or data exfiltration": 0.0007955540710055545,
+      "social engineering": 0.0007980218384483886
+    },
+    "severity": "none",
+    "severity_expected": 1.012,
+    "severities": {
+      "none": 0.9949631159281266,
+      "low": 0.0017855643570271395,
+      "medium": 0.0010745836282146657,
+      "high": 0.0010474438199734313,
+      "critical": 0.0011292922666581789
+    },
+    "evidence": [],
+    "timing": {
+      "read_ms": 34,
+      "total_ms": 35
+    }
+  },
+  "model_ms": 26.838623,
+  "credits": 2,
+  "cost_usd": 0.000398,
+  "cost_basis": "reference"
+}

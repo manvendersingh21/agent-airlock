@@ -1,0 +1,47 @@
+{
+  "endpoint": "script",
+  "request": {
+    "script": "Get-Date",
+    "threshold": 0.3,
+    "evidence": true
+  },
+  "raw": {
+    "model": "clocked-1.0",
+    "malicious": 0.0023154094672349634,
+    "suspicious": 0.0092,
+    "verdict": "benign",
+    "threshold": 0.3,
+    "instructions_used": "default",
+    "category": "benign administration",
+    "categories": {
+      "benign administration": 0.9908005948163572,
+      "security blinding or EDR evasion": 0.0011664877746445064,
+      "credential theft or memory dumping": 0.001388753276544874,
+      "unauthorized persistence or access expansion": 0.0007869818236175651,
+      "network reconnaissance or tunneling": 0.000849105978227707,
+      "forensic destruction or anti-forensics": 0.0008864065525148663,
+      "ransomware or data destruction": 0.0010043146889059421,
+      "obfuscated or in-memory payload": 0.001069055310858956,
+      "unsafe download or remote code execution": 0.0009655907059281313,
+      "data exfiltration": 0.0010827090724002688
+    },
+    "severity": "none",
+    "severity_expected": 1.141,
+    "severities": {
+      "none": 0.8804237089893684,
+      "low": 0.10864403409184664,
+      "medium": 0.0037437964423590398,
+      "high": 0.003768536535796067,
+      "critical": 0.003419923940629862
+    },
+    "evidence": [],
+    "timing": {
+      "read_ms": 61,
+      "total_ms": 61
+    }
+  },
+  "model_ms": 57.919617,
+  "credits": 3,
+  "cost_usd": 0.000598,
+  "cost_basis": "reference"
+}
