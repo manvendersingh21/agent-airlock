@@ -1,0 +1,55 @@
+{
+  "endpoint": "script",
+  "request": {
+    "script": "Set-MpPreference -DisableRealtimeMonitoring $true",
+    "threshold": 0.3,
+    "evidence": true
+  },
+  "raw": {
+    "model": "clocked-1.0",
+    "malicious": 0.9948889911694,
+    "suspicious": 0.9987,
+    "verdict": "malicious",
+    "threshold": 0.3,
+    "instructions_used": "default",
+    "category": "security blinding or EDR evasion",
+    "categories": {
+      "benign administration": 0.0013499021442595531,
+      "security blinding or EDR evasion": 0.987261825346862,
+      "credential theft or memory dumping": 0.0011373010002199329,
+      "unauthorized persistence or access expansion": 0.0018269256465792852,
+      "network reconnaissance or tunneling": 0.0009505540971849402,
+      "forensic destruction or anti-forensics": 0.0010170293225004333,
+      "ransomware or data destruction": 0.0013722132865555186,
+      "obfuscated or in-memory payload": 0.0011831554499416072,
+      "unsafe download or remote code execution": 0.0025447678852857833,
+      "data exfiltration": 0.0013563258206109252
+    },
+    "severity": "high",
+    "severity_expected": 4.391,
+    "severities": {
+      "none": 0.006427019017396814,
+      "low": 0.00869645836140447,
+      "medium": 0.02107835824139939,
+      "high": 0.5152299938084078,
+      "critical": 0.44856817057139153
+    },
+    "evidence": [
+      {
+        "line": "Set-MpPreference -DisableRealtimeMonitoring $true",
+        "start": 0,
+        "end": 49,
+        "confidence": 1
+      }
+    ],
+    "timing": {
+      "read_ms": 63,
+      "total_ms": 63
+    }
+  },
+  "model_ms": 60.251362,
+  "latency_ms": 227.35,
+  "credits": 3,
+  "cost_usd": 0.000598,
+  "cost_basis": "reference"
+}

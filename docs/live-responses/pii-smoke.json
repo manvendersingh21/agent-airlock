@@ -1,0 +1,82 @@
+{
+  "endpoint": "pii",
+  "request": {
+    "text": "Customer Maya Chen, maya.chen@example.com, +1 415-555-0138, reports that the printer is offline.",
+    "entities": [
+      "person",
+      "email",
+      "phone",
+      "username",
+      "address"
+    ],
+    "threshold": 0.5,
+    "anonymize": "replace"
+  },
+  "raw": {
+    "model": "clocked-1.0",
+    "entities": [
+      {
+        "type": "person",
+        "value": "Maya Chen",
+        "start": 9,
+        "end": 18,
+        "confidence": 1,
+        "source": "model",
+        "mentions": 1
+      },
+      {
+        "type": "email",
+        "value": "maya.chen@example.com",
+        "start": 20,
+        "end": 41,
+        "confidence": 1,
+        "source": "model",
+        "mentions": 1
+      },
+      {
+        "type": "phone",
+        "value": "+1 415-555-0138",
+        "start": 43,
+        "end": 58,
+        "confidence": 1,
+        "source": "model",
+        "mentions": 1
+      }
+    ],
+    "counts": {
+      "person": 1,
+      "email": 1,
+      "phone": 1
+    },
+    "threshold": 0.5,
+    "instructions_used": "default",
+    "mentions": {
+      "candidates": 0,
+      "variants": 0,
+      "reads": 0,
+      "verified": 0,
+      "occurrences": {
+        "read": 0,
+        "kept": 0
+      },
+      "rejected": {},
+      "spans": 0,
+      "ms": 0
+    },
+    "checks": {
+      "trimmed": 0,
+      "split": 0,
+      "rejected": {}
+    },
+    "anonymized_text": "Customer <PERSON>, <EMAIL>, <PHONE>, reports that the printer is offline.",
+    "timing": {
+      "read_ms": 112,
+      "total_ms": 113
+    }
+  },
+  "model_ms": 109.244736,
+  "latency_ms": 263.01,
+  "credits": 5,
+  "cost_usd": 0.000996,
+  "cost_basis": "reference"
+}
