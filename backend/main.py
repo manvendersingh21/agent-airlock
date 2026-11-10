@@ -13,7 +13,8 @@ from typing import Optional
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.staticfiles import StaticFiles
 
 from airlock.gateway import Gateway, ReviewConflict
 from airlock.models import Metrics, ReviewResolution, Run, RunRequest, Scenario
@@ -186,6 +187,43 @@ def create_app(*, storage=None, adapter=None, scenarios=None, review_token: Opti
                 return await request.app.state.gateway.resolve_review(run_id, payload)
         except ReviewConflict as conflict:
             raise HTTPException(409, str(conflict))
+
+    out_candidates = [
+        Path("/app/frontend/out"),
+        Path(__file__).resolve().parents[1] / "frontend" / "out",
+    ]
+    static_dir = next((p for p in out_candidates if p.is_dir()), None)
+    if static_dir is not None:
+        next_static = static_dir / "_next"
+        if next_static.is_dir():
+            application.mount("/_next", StaticFiles(directory=str(next_static)), name="next_static")
+
+        @application.api_route("/{full_path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"])
+        async def serve_static(request: Request, full_path: str):
+            if full_path.startswith("api/") or full_path == "healthz":
+                raise HTTPException(404, "not_found")
+            if request.method not in ("GET", "HEAD"):
+                raise HTTPException(404, "not_found")
+            if not full_path:
+                index_path = static_dir / "index.html"
+                if index_path.is_file():
+                    return FileResponse(index_path)
+                raise HTTPException(404, "not_found")
+            file_path = (static_dir / full_path).resolve()
+            if not str(file_path).startswith(str(static_dir.resolve())):
+                raise HTTPException(404, "not_found")
+            if file_path.is_file():
+                return FileResponse(file_path)
+            html_path = static_dir / f"{full_path}.html"
+            if html_path.is_file():
+                return FileResponse(html_path)
+            index_path = static_dir / full_path / "index.html"
+            if index_path.is_file():
+                return FileResponse(index_path)
+            fallback = static_dir / "index.html"
+            if fallback.is_file():
+                return FileResponse(fallback)
+            raise HTTPException(404, "not_found")
 
     return application
 

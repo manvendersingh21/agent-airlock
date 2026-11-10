@@ -1,6 +1,7 @@
 {
   "name": "agent-airlock-console",
   "version": "1.0.0",
+  "type": "module",
   "private": true,
   "scripts": {
     "dev": "next dev --hostname 0.0.0.0",
