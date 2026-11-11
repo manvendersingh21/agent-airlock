@@ -12,6 +12,7 @@ import { ScenarioSelector } from './scenario-selector';
 import { ComparisonView } from './comparison-view';
 import { TraceTimeline } from './trace-timeline';
 import { SystemStatePanel } from './system-state';
+import { InteractiveSandbox } from './interactive-sandbox';
 
 export function AttackLab() {
   const data = useConsoleData();
@@ -73,6 +74,7 @@ export function AttackLab() {
       {runError && <div className="notice notice-warning" role="alert"><Info size={17} /><div><strong>Run interrupted</strong><p>{runError}</p></div></div>}
       <div className="trace-section-heading"><div><h2>Follow the decision</h2><span className="caption-note">Evidence, policy, and execution in one place</span></div><div className="segmented-control"><button className={traceTab === 'protected' ? 'selected' : ''} onClick={() => setTraceTab('protected')}>Protected</button><button className={traceTab === 'baseline' ? 'selected' : ''} onClick={() => setTraceTab('baseline')}>Baseline</button></div></div>
       <TraceTimeline run={traceTab === 'protected' ? protectedRun : baseline} />
+      <InteractiveSandbox />
       <SystemStatePanel />
       <div className="lab-footnote"><ShieldCheck size={14} /><p>Clocked Guard, Protect, and Inspect checks are live. Tool actions execute with real system enforcement. Detector classifications feed deterministic policy boundaries.</p></div>
     </>}

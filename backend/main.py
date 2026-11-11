@@ -18,6 +18,9 @@ from fastapi.staticfiles import StaticFiles
 
 from airlock.gateway import Gateway, ReviewConflict
 from airlock.models import Metrics, ReviewResolution, Run, RunRequest, Scenario
+from airlock.preset_attacks import get_presets
+from airlock.proxy import ChatCompletionRequest, handle_chat_completion
+from airlock.screen import ScreenRequest, screen_custom_input
 from airlock.storage import Storage
 
 load_dotenv(Path(__file__).resolve().parent / ".env")
@@ -120,6 +123,45 @@ def create_app(*, storage=None, adapter=None, scenarios=None, review_token: Opti
     async def reset_system_state(request: Request):
         request.app.state.storage.clear_system_state()
         return {"status": "ok", "cleared": True}
+
+    @application.get("/api/presets")
+    async def list_presets():
+        return get_presets()
+
+    @application.post("/api/screen")
+    async def screen_input(payload: ScreenRequest, request: Request):
+        return await screen_custom_input(request.app.state.gateway.adapter, payload)
+
+    @application.get("/v1/models")
+    async def list_models():
+        return {
+            "object": "list",
+            "data": [
+                {"id": "airlock-enforced", "object": "model", "owned_by": "airlock"},
+                {"id": "gpt-4o-mini", "object": "model", "owned_by": "airlock"},
+                {"id": "gpt-4o", "object": "model", "owned_by": "airlock"},
+                {"id": "claude-3-5-sonnet", "object": "model", "owned_by": "airlock"},
+            ],
+        }
+
+    @application.post("/v1/chat/completions")
+    async def chat_completions(payload: ChatCompletionRequest, request: Request):
+        from fastapi.responses import JSONResponse
+        res = await handle_chat_completion(
+            payload,
+            request.app.state.gateway.adapter,
+            request.app.state.storage,
+        )
+        if res.get("blocked"):
+            return JSONResponse(
+                status_code=res.get("status_code", 400),
+                content={"error": res["error"]},
+            )
+        return JSONResponse(
+            status_code=200,
+            content=res["response"],
+            headers=res.get("headers", {}),
+        )
 
     @application.get("/api/scenarios", response_model=list[Scenario])
     async def list_scenarios(request: Request):

@@ -37,6 +37,11 @@ export const api = {
   outbox: () => request<import('./types').OutboxMessage[]>('/api/system/outbox'),
   tickets: () => request<import('./types').SupportTicket[]>('/api/system/tickets'),
   resetSystem: () => request<{ status: string; cleared: boolean }>('/api/system/reset', { method: 'POST' }),
+  presets: () => request<import('./types').PresetAttack[]>('/api/presets'),
+  screen: (payload: { text: string; script?: string; check_guard?: boolean; check_protect?: boolean; check_inspect?: boolean }) =>
+    request<import('./types').ScreenResult>('/api/screen', {
+      method: 'POST', body: JSON.stringify(payload),
+    }),
 };
 
 /** Follow real SSE events. Polling recovers a dropped stream without fabricating state. */

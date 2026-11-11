@@ -38,3 +38,16 @@ export interface SupportTicket {
   ticket_id: string; run_id: string; mode: string; customer_name: string;
   email: string; phone: string; issue_summary: string; created_at: string; pii_scrubbed: boolean;
 }
+export interface PresetAttack {
+  id: string; title: string; category: string; target_endpoint: string;
+  description: string; text: string; script: string; expected_decision: string;
+}
+export interface DiffToken {
+  kind: 'equal' | 'deleted' | 'added'; text: string;
+}
+export interface ScreenResult {
+  decision: Decision; reason: string; policy_version: string;
+  guard: Check | null; protect: Check | null; inspect: Check | null;
+  redaction_diff: DiffToken[]; entities_detected: Record<string, unknown>[];
+  total_latency_ms: number; total_credits: number; total_cost_usd: number;
+}
