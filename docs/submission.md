@@ -3,7 +3,7 @@
 **Clocked Build Challenge Submission**
 
 - **Project Name:** Agent Airlock
-- **Video File:** `agent-airlock-demo.mp4` (Duration: 1m 23s | Size: 3.1 MB | Format: 720p HD MP4)
+- **Video File:** `agent-airlock-demo.mp4` (Duration: 1m 23s | Size: 5.1 MB | Format: 720p HD MP4 | Audio: 48kHz Stereo AAC Ambient Score)
 - **GitHub Repository:** [github.com/manvendersingh21/agent-airlock](https://github.com/manvendersingh21/agent-airlock)
 - **Live Server:** `http://127.0.0.1:8000` (FastAPI backend + Next.js console + OpenAI Reverse Proxy)
 
@@ -31,6 +31,8 @@ Airlock features a drop-in OpenAI-compatible reverse proxy (`/v1/chat/completion
 ---
 
 ## 2. Second-by-Second Video Walkthrough & Voiceover Script
+
+> **Audio Note:** The video file (`agent-airlock-demo.mp4`) is muxed with an integrated calm ambient soundscape (48kHz stereo, lush Rhodes & analog pad progression) balanced at a subtle background level so voiceovers or live presentations remain crystal clear over top.
 
 This script matches the exact timing of `agent-airlock-demo.mp4`:
 
