@@ -16,3 +16,5 @@ playwright-report/
 test-results/
 frontend/recordings/
 .DS_Store
+.vercel
+.env*

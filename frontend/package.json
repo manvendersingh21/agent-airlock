@@ -15,6 +15,9 @@
     "react": "19.3.1",
     "react-dom": "19.3.1"
   },
+  "engines": {
+    "node": "24.x"
+  },
   "devDependencies": {
     "@playwright/test": "^1.65.0",
     "@types/node": "^22.10.0",

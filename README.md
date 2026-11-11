@@ -2,6 +2,10 @@
 
 **The security checkpoint between AI agents and the outside world.**
 
+- **Live Production URL:** [https://agent-airlock-sand.vercel.app](https://agent-airlock-sand.vercel.app)
+- **Video Walkthrough (with Narration):** [`agent-airlock-demo.mp4`](agent-airlock-demo.mp4) (Duration: 1m 23s)
+- **Submission Doc:** [`docs/submission.md`](docs/submission.md)
+
 Agent Airlock is an active security enforcement gateway and interactive attack-replay workbench. Powered by the official Clocked SDK (`clocked-sdk==0.7.0`), Airlock intercepts agent interactions, runs real-time security intelligence across **Guard**, **Protect**, and **Inspect**, and deterministically permits, redacts, blocks, or escalates every action before unsafe execution can occur.
 
 ```mermaid

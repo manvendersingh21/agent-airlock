@@ -5,7 +5,8 @@
 - **Project Name:** Agent Airlock
 - **Video File:** `agent-airlock-demo.mp4` (Duration: 1m 23s | Size: 5.1 MB | Format: 720p HD MP4 | Audio: 48kHz Stereo AAC Spoken Voiceover Narration + Calm Ambient Bed)
 - **GitHub Repository:** [github.com/manvendersingh21/agent-airlock](https://github.com/manvendersingh21/agent-airlock)
-- **Live Server:** `http://127.0.0.1:8000` (FastAPI backend + Next.js console + OpenAI Reverse Proxy)
+- **Live Production URL (Vercel):** [https://agent-airlock-sand.vercel.app](https://agent-airlock-sand.vercel.app)
+- **Local Server:** `http://127.0.0.1:8000` (FastAPI backend + Next.js console + OpenAI Reverse Proxy)
 
 ---
 

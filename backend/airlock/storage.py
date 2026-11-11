@@ -15,9 +15,17 @@ class Storage:
     def __init__(self, database_url: str = "sqlite:///./airlock.db"):
         path = database_url.removeprefix("sqlite:///")
         if path != ":memory:":
-            Path(path).expanduser().resolve().parent.mkdir(parents=True, exist_ok=True)
+            try:
+                Path(path).expanduser().resolve().parent.mkdir(parents=True, exist_ok=True)
+            except OSError:
+                path = "/tmp/airlock.db"
+                Path(path).parent.mkdir(parents=True, exist_ok=True)
         self._lock = threading.RLock()
-        self._connection = sqlite3.connect(path, check_same_thread=False, timeout=10)
+        try:
+            self._connection = sqlite3.connect(path, check_same_thread=False, timeout=10)
+        except sqlite3.OperationalError:
+            path = "/tmp/airlock.db"
+            self._connection = sqlite3.connect(path, check_same_thread=False, timeout=10)
         self._connection.execute("PRAGMA journal_mode=WAL")
         self._connection.execute("PRAGMA busy_timeout=10000")
         self._connection.execute("CREATE TABLE IF NOT EXISTS runs (run_id TEXT PRIMARY KEY, started_at TEXT NOT NULL, status TEXT NOT NULL, mode TEXT NOT NULL, data TEXT NOT NULL)")

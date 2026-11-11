@@ -39,7 +39,8 @@ def create_app(*, storage=None, adapter=None, scenarios=None, review_token: Opti
         if os.getenv("AIRLOCK_MODE", "live") != "live":
             raise RuntimeError("Only AIRLOCK_MODE=live is supported. Baseline is an explicitly labeled simulation.")
         from airlock.clocked_adapter import ClockedAdapter
-        current_storage = storage if storage is not None else Storage(os.getenv("DATABASE_URL", "sqlite:///./airlock.db"))
+        default_db = "sqlite:////tmp/airlock.db" if os.getenv("VERCEL") else "sqlite:///./airlock.db"
+        current_storage = storage if storage is not None else Storage(os.getenv("DATABASE_URL", default_db))
         current_adapter = adapter if adapter is not None else ClockedAdapter()
         current_storage.recover_interrupted()
         application.state.storage = current_storage
