@@ -219,3 +219,42 @@ def test_persistence_and_restart_fail_closed(tmp_path):
     assert reopened.get(pending.run_id).reason == "gateway_restarted"
     assert not reopened.get(pending.run_id).action_executed
     reopened.close()
+
+
+@pytest.mark.asyncio
+async def test_real_tools_outbox_and_tickets_execution():
+    storage = Storage("sqlite:///:memory:")
+    adapter = StubAdapter()
+    gateway = Gateway(storage, adapter)
+
+    # Baseline poisoned document actually delivers message to outbox
+    baseline_run = await run_scenario(gateway, "poisoned_document", mode="baseline")
+    assert baseline_run.action_executed
+    outbox = storage.list_outbox()
+    assert len(outbox) == 1
+    assert outbox[0]["recipient"] == "audit-drop@example.invalid"
+
+    # Protected poisoned document is BLOCKED: zero new messages in outbox
+    protected_run = await run_scenario(gateway, "poisoned_document", mode="protected")
+    assert protected_run.status == "BLOCK"
+    assert not protected_run.action_executed
+    assert len(storage.list_outbox()) == 1
+
+    # Protected privacy leak stores sanitized ticket
+    gateway_pii = Gateway(storage, StubAdapter(safe_text="Customer: [NAME_1]; email: [EMAIL_1]. The office printer is offline."))
+    privacy_run = await run_scenario(gateway_pii, "privacy_leak", mode="protected")
+    assert privacy_run.status == "REDACT"
+    assert privacy_run.action_executed
+    tickets = storage.list_tickets()
+    assert len(tickets) == 1
+    assert tickets[0]["pii_scrubbed"] is True
+    assert "Maya Chen" not in tickets[0]["customer_name"]
+
+    # Protected legitimate request executes real script runner in sandbox
+    benign_run = await run_scenario(gateway, "legitimate_request", mode="protected")
+    assert benign_run.status == "ALLOW"
+    assert benign_run.action_executed
+    assert benign_run.tool_result["executed"] is True
+    assert benign_run.tool_result["exit_code"] == 0
+    assert len(benign_run.tool_result["stdout"]) > 0
+

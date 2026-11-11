@@ -108,6 +108,19 @@ def create_app(*, storage=None, adapter=None, scenarios=None, review_token: Opti
     async def healthz():
         return {"status": "ok", "clocked_configured": bool(os.getenv("CLOCKED_API_KEY")), "mode": "live"}
 
+    @application.get("/api/system/outbox")
+    async def get_outbox(request: Request):
+        return request.app.state.storage.list_outbox()
+
+    @application.get("/api/system/tickets")
+    async def get_tickets(request: Request):
+        return request.app.state.storage.list_tickets()
+
+    @application.post("/api/system/reset")
+    async def reset_system_state(request: Request):
+        request.app.state.storage.clear_system_state()
+        return {"status": "ok", "cleared": True}
+
     @application.get("/api/scenarios", response_model=list[Scenario])
     async def list_scenarios(request: Request):
         order = {name: index for index, name in enumerate(["poisoned_document", "privacy_leak", "dangerous_script", "legitimate_request", "security_unavailable"])}

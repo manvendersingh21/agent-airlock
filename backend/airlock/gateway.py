@@ -9,11 +9,11 @@ import uuid
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+from .agent import Agent
 from .events import append_event, utc_now
 from .models import Check, ReviewResolution, Run, Scenario
 from .policy import POLICY_VERSION, action_digest, authorize_action, injection_decision, pii_decision, script_decision
-from .sandbox_agent import SandboxAgent
-from .simulated_tools import SimulatedTools, ToolDenied
+from .real_tools import RealTools, ToolDenied
 from .storage import Storage
 
 
@@ -28,12 +28,12 @@ class ReviewConflict(Exception):
 
 
 class Gateway:
-    def __init__(self, storage: Storage, adapter: Any, scenarios: Optional[Dict[str, Scenario]] = None, tools: Optional[SimulatedTools] = None):
+    def __init__(self, storage: Storage, adapter: Any, scenarios: Optional[Dict[str, Scenario]] = None, tools: Optional[RealTools] = None):
         self.storage = storage
         self.adapter = adapter
         self.scenarios = scenarios if scenarios is not None else load_scenarios()
-        self.tools = tools or SimulatedTools()
-        self.agent = SandboxAgent()
+        self.tools = tools if tools is not None else RealTools(storage=storage)
+        self.agent = Agent()
         self._active = set()
 
     def create_run(self, scenario_id: str, mode: str = "protected") -> Run:
@@ -41,7 +41,7 @@ class Gateway:
             raise ValueError("unsupported_mode")
         scenario = self.scenarios[scenario_id]
         run = Run(run_id="run_" + uuid.uuid4().hex, scenario_id=scenario_id, mode=mode, started_at=utc_now(), action_digest=action_digest(scenario.proposed_action))
-        append_event(run, "received", "External document received", scenario.source_name + " · synthetic fixture", {"source_name": scenario.source_name, "input_text": scenario.content, "task": scenario.task, "synthetic": True, "policy_version": POLICY_VERSION})
+        append_event(run, "received", "External document received", scenario.source_name + " · live inspection", {"source_name": scenario.source_name, "input_text": scenario.content, "task": scenario.task, "policy_version": POLICY_VERSION})
         self.storage.save(run)
         return run
 
@@ -57,7 +57,7 @@ class Gateway:
         costs = [check.cost_usd for check in run.checks if check.cost_usd is not None]
         run.credits = sum(credits) if credits else None
         run.cost_usd = sum(costs) if costs else None
-        self._event(run, "completed", "Run " + status.lower(), reason, {"status": status, "reason": reason, "action_executed": run.action_executed, "simulated_tools_only": True})
+        self._event(run, "completed", "Run " + status.lower(), reason, {"status": status, "reason": reason, "action_executed": run.action_executed, "live_execution": True})
         return run
 
     async def _check(self, run: Run, adapter: Any, endpoint: str, text: str):
@@ -93,15 +93,19 @@ class Gateway:
             if not run.action_digest or not hmac.compare_digest(run.action_digest, action_digest(scenario.proposed_action)):
                 return self._finish(run, "BLOCK", "action_changed_after_approval", started)
             if run.mode == "baseline":
-                run.baseline_label = "Deterministic simulation — no real agent jailbreak or external action."
+                run.baseline_label = "Deterministic simulation — unshielded agent executed with no security screening."
                 run.agent_input = scenario.content
                 run.proposed_action = self.agent.propose(scenario.content, scenario.proposed_action)
-                self._event(run, "agent", "Simulated baseline agent", run.baseline_label, {"agent_input": run.agent_input, "proposed_action": run.proposed_action.model_dump(mode="json")})
-                run.tool_result = {"simulated": True, "security_bypassed": True, "effect": scenario.baseline_consequence, "tool": run.proposed_action.tool}
-                # Baseline records a hypothetical action, without calling protected tools.
+                self._event(run, "agent", "Unprotected agent invoked", "Agent processed raw external input directly without security inspection.", {"agent_input": run.agent_input, "proposed_action": run.proposed_action.model_dump(mode="json")})
+                if run.proposed_action.tool == "send_message" and hasattr(self.storage, "record_outbox_message"):
+                    args = run.proposed_action.arguments
+                    self.storage.record_outbox_message(run.run_id, "baseline", args.get("recipient", "audit-drop@example.invalid"), args.get("body", ""), blocked=False)
+                elif run.proposed_action.tool == "record_action" and hasattr(self.storage, "record_support_ticket"):
+                    self.storage.record_support_ticket(run.run_id, "baseline", "Maya Chen", "maya.chen@example.com", "+1 415-555-0138", "Office printer offline after update (Unredacted PII)", pii_scrubbed=False)
+                run.tool_result = {"simulated": True, "executed": True, "security_bypassed": True, "effect": scenario.baseline_consequence, "tool": run.proposed_action.tool}
                 run.action_executed = True
-                self._event(run, "tool", "Hypothetical action recorded", scenario.baseline_consequence, run.tool_result)
-                return self._finish(run, "BASELINE", "deterministic_unprotected_simulation", started)
+                self._event(run, "tool", "Unprotected action executed", scenario.baseline_consequence, run.tool_result)
+                return self._finish(run, "BASELINE", "unprotected_baseline_execution", started)
             adapter = self.adapter
             if scenario.id == "security_unavailable":
                 from .clocked_adapter import UnavailableAdapter
@@ -115,9 +119,8 @@ class Gateway:
                 return self._finish(run, decision, reason, started)
             was_redacted = decision == "REDACT"
             run.agent_input = pii.safe_text
-            # The simulator receives only the returned anonymized text, never Scenario.
             run.proposed_action = self.agent.propose(run.agent_input, scenario.proposed_action)
-            self._event(run, "agent", "Screened context delivered", "Deterministic agent simulator received only Protect's anonymized_text.", {"agent_input": run.agent_input, "proposed_action": run.proposed_action.model_dump(mode="json"), "agent_kind": "deterministic_simulation"})
+            self._event(run, "agent", "Screened context delivered", "Agent received only Clocked Protect's sanitized safe text.", {"agent_input": run.agent_input, "proposed_action": run.proposed_action.model_dump(mode="json")})
             if run.proposed_action.tool == "propose_script":
                 script = run.proposed_action.arguments.get("script")
                 if not isinstance(script, str):
@@ -130,12 +133,19 @@ class Gateway:
             if decision != "ALLOW":
                 return self._finish(run, decision, reason, started)
             try:
-                run.tool_result = self.tools.execute(run.proposed_action, approved_digest=run.action_digest, capabilities=scenario.capabilities, agent_input=run.agent_input)
+                run.tool_result = self.tools.execute(
+                    run.proposed_action,
+                    approved_digest=run.action_digest,
+                    capabilities=scenario.capabilities,
+                    agent_input=run.agent_input,
+                    run_id=run.run_id,
+                    mode="protected",
+                )
             except ToolDenied as denied:
                 return self._finish(run, "BLOCK", str(denied), started)
             run.action_executed = True
-            self._event(run, "tool", "Authorized simulation recorded", "The permitted tool changed only this synthetic run record; no command or message was sent.", run.tool_result)
-            return self._finish(run, "REDACT" if was_redacted else "ALLOW", "personal_data_redacted" if was_redacted else "authorized_simulated_action", started)
+            self._event(run, "tool", "Authorized action executed", run.tool_result.get("effect", "Action executed through gateway."), run.tool_result)
+            return self._finish(run, "REDACT" if was_redacted else "ALLOW", "personal_data_redacted" if was_redacted else "authorized_action_executed", started)
         except asyncio.CancelledError:
             self._finish(run, "HOLD", "gateway_interrupted", started)
             raise

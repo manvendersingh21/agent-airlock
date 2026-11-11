@@ -34,6 +34,9 @@ export const api = {
   createRun: (scenario_id: string, mode: 'baseline' | 'protected') => request<Run>('/api/runs', {
     method: 'POST', body: JSON.stringify({ scenario_id, mode }),
   }),
+  outbox: () => request<import('./types').OutboxMessage[]>('/api/system/outbox'),
+  tickets: () => request<import('./types').SupportTicket[]>('/api/system/tickets'),
+  resetSystem: () => request<{ status: string; cleared: boolean }>('/api/system/reset', { method: 'POST' }),
 };
 
 /** Follow real SSE events. Polling recovers a dropped stream without fabricating state. */

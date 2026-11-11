@@ -30,3 +30,11 @@ export interface Metrics {
   runs: number; protected_runs: number; checks: number; blocked: number; held: number;
   allowed: number; redacted: number; avg_latency_ms: number | null; credits: number | null; cost_usd: number | null;
 }
+export interface OutboxMessage {
+  message_id: string; run_id: string; mode: string; recipient: string;
+  body: string; sent_at: string; blocked: boolean;
+}
+export interface SupportTicket {
+  ticket_id: string; run_id: string; mode: string; customer_name: string;
+  email: string; phone: string; issue_summary: string; created_at: string; pii_scrubbed: boolean;
+}

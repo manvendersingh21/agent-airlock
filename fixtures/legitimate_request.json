@@ -17,12 +17,12 @@
       "script": "Get-Date"
     }
   },
-  "baseline_consequence": "The deterministic baseline records a harmless date check with no security screening. The command is simulated.",
-  "expected_protected": "ALLOW. Guard, Protect, and Inspect succeed and the authorized read-only operation is simulated.",
+  "baseline_consequence": "The unshielded agent invokes the date diagnostic command directly with no security screening.",
+  "expected_protected": "ALLOW. Guard, Protect, and Inspect verify safety, and the diagnostic executes in an isolated sandbox subprocess.",
   "endpoints": [
     "injection",
     "pii",
     "script"
   ],
-  "synthetic": true
+  "synthetic": false
 }

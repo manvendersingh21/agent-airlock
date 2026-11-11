@@ -3,8 +3,9 @@ from __future__ import annotations
 
 import sqlite3
 import threading
+import uuid
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from .events import append_event, utc_now
 from .models import Metrics, Run
@@ -21,6 +22,8 @@ class Storage:
         self._connection.execute("PRAGMA busy_timeout=10000")
         self._connection.execute("CREATE TABLE IF NOT EXISTS runs (run_id TEXT PRIMARY KEY, started_at TEXT NOT NULL, status TEXT NOT NULL, mode TEXT NOT NULL, data TEXT NOT NULL)")
         self._connection.execute("CREATE TABLE IF NOT EXISTS reviews (run_id TEXT PRIMARY KEY REFERENCES runs(run_id), decision TEXT NOT NULL, resolved_at TEXT NOT NULL)")
+        self._connection.execute("CREATE TABLE IF NOT EXISTS outbox_messages (message_id TEXT PRIMARY KEY, run_id TEXT NOT NULL, mode TEXT NOT NULL, recipient TEXT NOT NULL, body TEXT NOT NULL, sent_at TEXT NOT NULL, blocked INTEGER NOT NULL DEFAULT 0)")
+        self._connection.execute("CREATE TABLE IF NOT EXISTS support_tickets (ticket_id TEXT PRIMARY KEY, run_id TEXT NOT NULL, mode TEXT NOT NULL, customer_name TEXT NOT NULL, email TEXT NOT NULL, phone TEXT NOT NULL, issue_summary TEXT NOT NULL, created_at TEXT NOT NULL, pii_scrubbed INTEGER NOT NULL DEFAULT 0)")
         self._connection.commit()
 
     def save(self, run: Run) -> None:
@@ -74,6 +77,89 @@ class Storage:
         credits = [check.credits for check in checks if check.credits is not None]
         costs = [check.cost_usd for check in checks if check.cost_usd is not None]
         return Metrics(runs=len(runs), protected_runs=len(protected), checks=len(checks), blocked=sum(run.status == "BLOCK" for run in protected), held=sum(run.status == "HOLD" for run in protected), allowed=sum(run.status == "ALLOW" for run in protected), redacted=sum(run.status == "REDACT" for run in protected), avg_latency_ms=(sum(check.latency_ms for check in successful) / len(successful)) if successful else None, credits=sum(credits) if credits else None, cost_usd=sum(costs) if costs else None)
+
+    def record_outbox_message(self, run_id: str, mode: str, recipient: str, body: str, blocked: bool = False) -> Dict[str, Any]:
+        msg_id = "msg_" + uuid.uuid4().hex[:10]
+        now = utc_now()
+        with self._lock, self._connection:
+            self._connection.execute(
+                "INSERT INTO outbox_messages(message_id, run_id, mode, recipient, body, sent_at, blocked) VALUES(?,?,?,?,?,?,?)",
+                (msg_id, run_id, mode, recipient, body, now, 1 if blocked else 0)
+            )
+        return {
+            "message_id": msg_id,
+            "run_id": run_id,
+            "mode": mode,
+            "recipient": recipient,
+            "body": body,
+            "sent_at": now,
+            "blocked": blocked,
+        }
+
+    def list_outbox(self, limit: int = 50) -> List[Dict[str, Any]]:
+        with self._lock:
+            rows = self._connection.execute(
+                "SELECT message_id, run_id, mode, recipient, body, sent_at, blocked FROM outbox_messages ORDER BY sent_at DESC LIMIT ?",
+                (limit,)
+            ).fetchall()
+        return [
+            {
+                "message_id": r[0],
+                "run_id": r[1],
+                "mode": r[2],
+                "recipient": r[3],
+                "body": r[4],
+                "sent_at": r[5],
+                "blocked": bool(r[6]),
+            }
+            for r in rows
+        ]
+
+    def record_support_ticket(self, run_id: str, mode: str, customer_name: str, email: str, phone: str, issue_summary: str, pii_scrubbed: bool = False) -> Dict[str, Any]:
+        t_id = "tkt_" + uuid.uuid4().hex[:10]
+        now = utc_now()
+        with self._lock, self._connection:
+            self._connection.execute(
+                "INSERT INTO support_tickets(ticket_id, run_id, mode, customer_name, email, phone, issue_summary, created_at, pii_scrubbed) VALUES(?,?,?,?,?,?,?,?,?)",
+                (t_id, run_id, mode, customer_name, email, phone, issue_summary, now, 1 if pii_scrubbed else 0)
+            )
+        return {
+            "ticket_id": t_id,
+            "run_id": run_id,
+            "mode": mode,
+            "customer_name": customer_name,
+            "email": email,
+            "phone": phone,
+            "issue_summary": issue_summary,
+            "created_at": now,
+            "pii_scrubbed": pii_scrubbed,
+        }
+
+    def list_tickets(self, limit: int = 50) -> List[Dict[str, Any]]:
+        with self._lock:
+            rows = self._connection.execute(
+                "SELECT ticket_id, run_id, mode, customer_name, email, phone, issue_summary, created_at, pii_scrubbed FROM support_tickets ORDER BY created_at DESC LIMIT ?",
+                (limit,)
+            ).fetchall()
+        return [
+            {
+                "ticket_id": r[0],
+                "run_id": r[1],
+                "mode": r[2],
+                "customer_name": r[3],
+                "email": r[4],
+                "phone": r[5],
+                "issue_summary": r[6],
+                "created_at": r[7],
+                "pii_scrubbed": bool(r[8]),
+            }
+            for r in rows
+        ]
+
+    def clear_system_state(self) -> None:
+        with self._lock, self._connection:
+            self._connection.execute("DELETE FROM outbox_messages")
+            self._connection.execute("DELETE FROM support_tickets")
 
     def close(self) -> None:
         with self._lock:
