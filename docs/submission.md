@@ -3,7 +3,7 @@
 **Clocked Build Challenge Submission**
 
 - **Project Name:** Agent Airlock
-- **Video File:** `agent-airlock-demo.mp4` (Duration: 1m 23s | Size: 5.1 MB | Format: 720p HD MP4 | Audio: 48kHz Stereo AAC Ambient Score)
+- **Video File:** `agent-airlock-demo.mp4` (Duration: 1m 23s | Size: 5.1 MB | Format: 720p HD MP4 | Audio: 48kHz Stereo AAC Spoken Voiceover Narration + Calm Ambient Bed)
 - **GitHub Repository:** [github.com/manvendersingh21/agent-airlock](https://github.com/manvendersingh21/agent-airlock)
 - **Live Server:** `http://127.0.0.1:8000` (FastAPI backend + Next.js console + OpenAI Reverse Proxy)
 
@@ -30,22 +30,22 @@ Airlock features a drop-in OpenAI-compatible reverse proxy (`/v1/chat/completion
 
 ---
 
-## 2. Second-by-Second Video Walkthrough & Voiceover Script
+## 2. Second-by-Second Video Walkthrough & Spoken Voiceover Narration
 
-> **Audio Note:** The video file (`agent-airlock-demo.mp4`) is muxed with an integrated calm ambient soundscape (48kHz stereo, lush Rhodes & analog pad progression) balanced at a subtle background level so voiceovers or live presentations remain crystal clear over top.
+> **Audio Note:** `agent-airlock-demo.mp4` features professional, calm neural voiceover narration mixed with sidechain-ducked ambient audio (48kHz stereo AAC). The voiceover is crisp and front-and-center, while the ambient bed rises gently during pauses.
 
-This script matches the exact timing of `agent-airlock-demo.mp4`:
+This script matches the exact timing and spoken words in `agent-airlock-demo.mp4`:
 
-| Timestamp | Screen Action | Voiceover Script |
+| Timestamp | Screen Action | Exact Spoken Voiceover Narration |
 |:---|:---|:---|
-| **0:00 - 0:10** | Camera opens on dashboard hero: "Attack Lab — LIVE CLOCKED INTEGRATION". | *"This is Agent Airlock — the security enforcement gateway between AI agents and the outside world. Autonomous agents shouldn't have unrestricted access to execute tools, leak data, or run arbitrary scripts."* |
-| **0:10 - 0:25** | Clicks **Poisoned document** scenario. Document shows hidden prompt injection instructing agent to exfiltrate records to `audit-drop@example.invalid`. Clicks **Run comparison**. | *"Here, an untrusted vendor document contains an indirect prompt injection trying to exfiltrate employee records. Without Airlock, the unshielded agent falls for it and dispatches the message. But with Airlock, Clocked Guard intercepts it in 380 milliseconds, extracts the evidence quotes, and blocks the run."* |
-| **0:25 - 0:35** | Scrolls down to **Live Environment State** panel showing SQLite Outbox. | *"Look at our live system outbox: the unshielded baseline leak is logged, while under Airlock protection, zero outbound messages were dispatched. Exfiltration is prevented at the boundary."* |
-| **0:35 - 0:50** | Clicks **Privacy leak** scenario (Maya Chen ticket). Clicks **Run comparison**. Toggles **Agent received** tab. | *"Next, a customer support ticket contains raw personal phone numbers and emails. Clocked Protect evaluates the document, strips all customer PII, and replaces them with cryptographic tokens before the agent ever sees it. In our live database, only scrubbed tokens are stored."* |
-| **0:50 - 1:00** | Clicks **Legitimate request** scenario (`Get-Date`). Clicks **Run comparison**. | *"Airlock doesn't just block everything. For a legitimate operations check, Guard, Protect, and Inspect all verify safety. Airlock authorizes execution, spawns an isolated subprocess, and returns the real date and timestamp output."* |
-| **1:00 - 1:15** | Scrolls to **Interactive Attack Sandbox**. Clicks **DAN / Developer Mode Jailbreak** preset. Clicks **Screen & Enforce**. | *"Judges and developers don't have to take our word for it. In our Interactive Attack Sandbox, you can test any custom prompt. Testing a DAN jailbreak, Clocked Guard catches the persona override and triggers an instant block with exact quote evidence."* |
-| **1:15 - 1:20** | Clicks **Support Ticket PII Exposure** preset. Clicks **Screen & Enforce**. | *"Testing sensitive support tickets with SSNs and credit cards, Clocked Protect produces a live visual diff showing deleted PII and sanitized replacement badges."* |
-| **1:20 - 1:23** | Scrolls to **Drop-in Agent Reverse Proxy** panel. Shows Python SDK and cURL tabs. | *"Best of all, Airlock provides a drop-in OpenAI-compatible reverse proxy at localhost:8000/v1. Wrap any LangChain or OpenAI agent in two lines of code, and you're instantly protected by Clocked."* |
+| **0:00 - 0:07** | Camera opens on dashboard hero: "Attack Lab — LIVE CLOCKED INTEGRATION". | *"This is Agent Airlock, the security enforcement gateway between AI agents and the outside world."* |
+| **0:10 - 0:20** | Clicks **Poisoned document** scenario. Document shows hidden prompt injection. Clicks **Run comparison**. | *"When an untrusted document contains an indirect prompt injection, Clocked Guard intercepts it in milliseconds, extracts quote evidence, and enforces a hard block."* |
+| **0:24 - 0:32** | Scrolls down to **Live Environment State** panel showing SQLite Outbox. | *"In our live SQLite outbox, the unshielded baseline leaked, while under Airlock protection, zero outbound messages were sent."* |
+| **0:34 - 0:45** | Clicks **Privacy leak** scenario (Maya Chen ticket). Clicks **Run comparison**. Toggles **Agent received** tab. | *"Next, a customer ticket contains sensitive contact details. Clocked Protect strips all PII and injects cryptographic tokens before the agent ever sees it."* |
+| **0:48 - 0:58** | Clicks **Legitimate request** scenario (`Get-Date`). Clicks **Run comparison**. | *"For legitimate diagnostic requests, Guard, Protect, and Inspect confirm safety, authorizing an isolated sandbox subprocess to return real output."* |
+| **0:58 - 1:07** | Scrolls to **Interactive Attack Sandbox**. Clicks **DAN Jailbreak** preset. Clicks **Screen & Enforce**. | *"In our Interactive Attack Sandbox, test any prompt. Testing a DAN jailbreak, Clocked Guard catches the persona override instantly."* |
+| **1:08 - 1:15** | Clicks **Support Ticket PII Exposure** preset. Clicks **Screen & Enforce**. | *"Testing sensitive support tickets, Clocked Protect renders a live visual token diff of all scrubbed data."* |
+| **1:15 - 1:21** | Scrolls to **Drop-in Agent Reverse Proxy** panel. Shows Python SDK and cURL tabs, then navigates Policies, Event Stream, and Audit views. | *"With a drop-in OpenAI proxy and full audit streaming, this is Agent Airlock."* |
 
 ---
 
