@@ -27,12 +27,12 @@ export function Shell({ children, health, loading = false }: { children: ReactNo
   return <div className="app-shell">
     {mobileOpen && <button className="sidebar-overlay" aria-label="Close navigation" onClick={() => setMobileOpen(false)} />}
     <aside className={`sidebar ${mobileOpen ? 'open' : ''}`}>
-      <Link href="/" className="brand" onClick={() => setMobileOpen(false)}><span className="brand-mark"><AirlockMark /></span><span>AIRLOCK<span className="brand-sub">AGENT SECURITY</span></span></Link>
+      <Link href="/" className="brand" onClick={() => setMobileOpen(false)}><span className="brand-mark"><AirlockMark /></span><span>AIRLOCK<span className="brand-sub">Agent Security</span></span></Link>
       <button className="icon-button mobile-close" aria-label="Close navigation" onClick={() => setMobileOpen(false)}><X size={18} /></button>
       <div className="workspace-switch"><div className="workspace-icon"><Layers3 size={16} /></div><div>Demo workspace<span>Clocked Build Challenge</span></div><span className="workspace-dot" /></div>
-      <div className="nav-label">WORKSPACE</div>
+      <div className="nav-label">Workspace</div>
       <nav aria-label="Main navigation">{links.filter((link) => link.group === 'workspace').map((link) => <Link key={link.path} href={link.path} className={`nav-item ${active?.path === link.path ? 'active' : ''}`} onClick={() => setMobileOpen(false)}><link.icon size={18} /><span>{link.label}</span>{active?.path === link.path && <span className="nav-active-dot" />}</Link>)}</nav>
-      <div className="nav-label configure-label">CONFIGURATION</div>
+      <div className="nav-label configure-label">Configuration</div>
       <nav aria-label="Configuration">{links.filter((link) => link.group === 'configure').map((link) => <Link key={link.path} href={link.path} className={`nav-item ${active?.path === link.path ? 'active' : ''}`} onClick={() => setMobileOpen(false)}><link.icon size={18} /><span>{link.label}</span></Link>)}</nav>
       <div className="sidebar-bottom">
         <div className="boundary-note"><ShieldCheck size={20} /><strong>Every action has a checkpoint.</strong><p>Real security checks.<br />Simulated tools. Full visibility.</p><Link href="/policies/">Explore the policy <ArrowUpRight size={13} /></Link></div>
@@ -43,7 +43,7 @@ export function Shell({ children, health, loading = false }: { children: ReactNo
     <div className="main-shell">
       <header className="topbar">
         <div className="breadcrumbs"><button className="icon-button mobile-menu" aria-label="Open navigation" onClick={() => setMobileOpen(true)}><Menu size={19} /></button><PanelLeftClose size={17} className="desktop-panel-icon" /><span>Workspace</span><ChevronRight size={13} /><strong>{active?.label ?? 'Security console'}</strong></div>
-        <div className="topbar-right"><span className="environment-tag"><span /> SANDBOX</span><span className={`connection-state ${health ? 'connected' : ''}`}><Radio size={13} />{loading ? 'Connecting' : health ? 'Gateway connected' : 'Gateway offline'}</span></div>
+        <div className="topbar-right"><span className="environment-tag">Sandbox mode</span><span className={`connection-state ${health ? 'connected' : ''}`}><Radio size={13} />{loading ? 'Connecting' : health ? 'Gateway connected' : 'Gateway offline'}</span></div>
       </header>
       <main>{children}</main>
       <footer className="page-footer"><span><AirlockMark small /> The security checkpoint between AI agents and the outside world.</span><span>Powered by <strong>Clocked</strong> <span className="footer-dot">·</span> Guard / Protect / Inspect</span></footer>

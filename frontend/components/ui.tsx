@@ -18,11 +18,11 @@ export function ConnectionNotice({ message, retry }: { message: string | null; r
 }
 
 export function EmptyState({ title, children, icon: Icon = ShieldCheck }: { title: string; children: ReactNode; icon?: typeof ShieldCheck }) {
-  return <div className="empty-state"><span className="empty-icon"><Icon size={25} strokeWidth={1.4} /></span><h3>{title}</h3><p>{children}</p></div>;
+  return <div className="empty-state"><Icon size={32} strokeWidth={1.5} className="empty-icon-inline" /><h3>{title}</h3><p>{children}</p></div>;
 }
 
 export function SectionTitle({ eyebrow, title, children, aside }: { eyebrow?: string; title: string; children?: ReactNode; aside?: ReactNode }) {
-  return <div className="page-heading"><div>{eyebrow && <div className="eyebrow"><span />{eyebrow}</div>}<h1>{title}</h1>{children && <p>{children}</p>}</div>{aside}</div>;
+  return <div className="page-heading"><div><h1>{title}</h1>{children && <p>{children}</p>}</div>{aside}</div>;
 }
 
 export function timeLabel(value: string) { return new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
